@@ -9,13 +9,14 @@ import datetime
 
 from dataHandler import *
 from dataVisualization import *
+from sentimentAnalysis import *
 
 
 def main():
     eth_data, btc_data, elon_data = loadRawData()
     visualizeRawData(eth_data, btc_data, elon_data)
     preprocessData()
-
+    #sentimentAnalysis(elon_data)
 
 if __name__ == '__main__':
     main()
