@@ -13,8 +13,8 @@ from sentimentAnalysis import *
 
 
 def main():
-    eth_data, btc_data, elon_data = loadRawData()
-    visualizeRawData(eth_data, btc_data, elon_data)
+    eth_data, btc_data, tweet_data = loadRawData()
+    visualizeRawData(eth_data, btc_data, tweet_data)
     preprocessData()
     #sentimentAnalysis(elon_data)
 

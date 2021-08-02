@@ -9,7 +9,7 @@ def preprocessData():
         return loadPreprocessedData(BASE_PATH, PROCESSED_PATH)
     else:
         print("Preprocesssing Eth Data.")
-
+        #### return stuff
 
 
 #########################################################
@@ -18,8 +18,8 @@ def preprocessData():
 def loadPreprocessedData(BASE_PATH, PROCESSED_PATH):
     eth_data = pd.read_csv(getRelPath(BASE_PATH, PROCESSED_PATH,'ETH-USD-Processed.csv'))
     btc_data = pd.read_csv(getRelPath(BASE_PATH, PROCESSED_PATH, 'BTC-USD-Processed.csv'))
-    elon_data = pd.read_csv(getRelPath(BASE_PATH, PROCESSED_PATH, 'elon-Processed.csv'))
-    return eth_data, btc_data, elon_data
+    tweet_data = pd.read_csv(getRelPath(BASE_PATH, PROCESSED_PATH, 'tweets.csv'))
+    return eth_data, btc_data, tweet_data
 
 def loadRawData():
     BASE_PATH = os.path.dirname(__file__)
@@ -27,8 +27,8 @@ def loadRawData():
     na_lst = ['#N/A', '#N/A', 'N/A', '#NA', '-1.#IND', '-1.#QNAN', '-NaN', '-nan', '1.#IND', '1.#QNAN', '<NA>', 'N/A', 'NA', 'NULL', 'NaN', 'n/a', 'nan', 'null', 'Unknown', 'unknown']
     eth_data = pd.read_csv(getRelPath(BASE_PATH, RAW_PATH,'ETH-USD.csv'), na_values=na_lst, parse_dates=['Date'])
     btc_data = pd.read_csv(getRelPath(BASE_PATH, RAW_PATH, 'BTC-USD.csv'), na_values=na_lst, parse_dates=['Date'])
-    elon_data = pd.read_csv(getRelPath(BASE_PATH, RAW_PATH, 'elon.csv'), na_values=na_lst, sep ='\t')
-    return eth_data, btc_data, elon_data
+    tweet_data = pd.read_csv(getRelPath(BASE_PATH, RAW_PATH, 'tweets.csv'), na_values=na_lst, sep ='\t')
+    return eth_data, btc_data, tweet_data
 
 def getRelPath(BASE_PATH, PROCESSED_PATH, SUB_PATH):
     return BASE_PATH + PROCESSED_PATH + SUB_PATH
@@ -39,7 +39,7 @@ def getRelPath(BASE_PATH, PROCESSED_PATH, SUB_PATH):
 def dataAlreadyPreprocessed(BASE_PATH, PROCESSED_PATH):
     return ethDatasetPreprocessed(BASE_PATH, PROCESSED_PATH) and \
         btcDatasetPreprocessed(BASE_PATH, PROCESSED_PATH) and \
-        elonDatasetPreprocessed(BASE_PATH, PROCESSED_PATH)
+        tweetDatasetPreprocessed(BASE_PATH, PROCESSED_PATH)
 
 def ethDatasetPreprocessed(BASE_PATH, PROCESSED_PATH):
     return os.path.exists(getRelPath(BASE_PATH, PROCESSED_PATH,'ETH-USD-Processed.csv'))
@@ -47,5 +47,8 @@ def ethDatasetPreprocessed(BASE_PATH, PROCESSED_PATH):
 def btcDatasetPreprocessed(BASE_PATH, PROCESSED_PATH):
     return os.path.exists(getRelPath(BASE_PATH, PROCESSED_PATH,'BTC-USD-Processed.csv'))
 
-def elonDatasetPreprocessed(BASE_PATH, PROCESSED_PATH):
-    return os.path.exists(getRelPath(BASE_PATH, PROCESSED_PATH,'elon-Processed.csv'))
+def tweetDatasetPreprocessed(BASE_PATH, PROCESSED_PATH):
+    return os.path.exists(getRelPath(BASE_PATH, PROCESSED_PATH,'tweets-Processed.csv'))
+
+def processData():
+    
