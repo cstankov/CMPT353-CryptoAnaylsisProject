@@ -25,9 +25,8 @@ def process_data():
     return eth_tweet_data, btc_tweet_data
     
 def process_tweet_data(tweet_data):
-    # tweet_data = sentimentAnalysis(tweet_data)
-    # tweet_data = tweet_data.sort_values(by='date', ascending=True).reset_index()
-    tweet_data = pd.read_csv('test.csv', sep='\t')
+    tweet_data = sentimentAnalysis(tweet_data)
+    tweet_data = tweet_data.sort_values(by='date', ascending=True).reset_index()
     tweet_data = calculate_average_sentiment(tweet_data)
     tweet_data['date'] = pd.to_datetime(tweet_data['date'])
     tweet_data = tweet_data.rename({'date':'Date'}, axis=1)
