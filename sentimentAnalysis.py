@@ -1,6 +1,4 @@
-import pandas as pd
-from dataHandler import *
-from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+from cryptoAnalysis import *
 
 def getSentimentScore(tweet):
     analyzer = SentimentIntensityAnalyzer()
@@ -16,7 +14,7 @@ def getSentiment(tweet):
     elif(sentiment_score > 0):
         return 'positive'
 
-def sentimentAnalysis(elon_data):
-    elon_data['sentiment'] = elon_data['tweet'].apply(getSentiment)
-    #elon_data['sentiment score'] = elon_data['tweet'].apply(getSentimentScore)
-    #elon_data.to_csv('sentiment.csv')
+def sentimentAnalysis(tweet_data):
+    print("Running Sentiment Analysis...")
+    tweet_data['sentiment'] = tweet_data['tweet'].apply(getSentimentScore)
+    return tweet_data
