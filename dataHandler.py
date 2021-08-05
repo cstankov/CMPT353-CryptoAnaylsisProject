@@ -16,7 +16,8 @@ def preprocess_data():
 
 def process_data():
     eth_data, btc_data, tweet_data = loadRawData()
-    # visualize_raw_data(eth_data, btc_data, tweet_data) # Display raw data
+    visualize_raw_data(eth_data, btc_data, tweet_data) # Display raw data
+    tweet_data.drop('name', axis=1)
     tweet_data = process_tweet_data(tweet_data)
     eth_data = process_eth_data(eth_data)
     btc_data = process_btc_data(btc_data)
@@ -41,17 +42,28 @@ def calculate_average_sentiment(tweet_data):
     return tweet_data 
 
 def process_eth_data(eth_data):
-    return eth_data.dropna().reset_index(drop=True)
+    eth_data = eth_data.dropna().reset_index(drop=True)
+    return calculate_price_change(eth_data)
 
 def process_btc_data(btc_data):
-    return btc_data.dropna().reset_index(drop=True)
+    btc_data = btc_data.dropna().reset_index(drop=True)
+    return calculate_price_change(btc_data)
+
+def calculate_price_change(crypto_data):
+    conditions = [crypto_data['Open'] < crypto_data['Close'], crypto_data['Open'] > crypto_data['Close']]
+    choices = ['Increased', 'Decreased']
+    crypto_data['Price_change'] = np.select(conditions, choices, default='Neutral')
+    return crypto_data
 
 #########################################################
 # MERGE DATA
 
 def merge_crypto_with_tweets(eth_data, btc_data, tweet_data):
+    column_order = ['Date', 'Open', 'High', 'Low', 'Close', 'Adj Close', 'Volume', 'sentiment', 'Price_change']
     eth_tweet_data = eth_data.merge(tweet_data, on='Date', how='inner')
     btc_tweet_data = btc_data.merge(tweet_data, on='Date', how='inner')
+    eth_tweet_data = eth_tweet_data[column_order]
+    btc_tweet_data = btc_tweet_data[column_order]
     return eth_tweet_data, btc_tweet_data
 
 #########################################################
@@ -89,7 +101,7 @@ def load_raw_eth_data(BASE_PATH, RAW_PATH, na_lst):
     return pd.read_csv(getRelPath(BASE_PATH, RAW_PATH,'ETH-USD.csv'), usecols=fields,  na_values=na_lst, parse_dates=['Date'])
 
 def load_raw_tweet_data(BASE_PATH, RAW_PATH, na_lst):
-    fields = ['date', 'tweet', 'likes_count']
+    fields = ['date', 'name', 'tweet', 'likes_count']
     dtype = {'tweet':str, 'likes_count':int}
     parse_dates=['date']
     return pd.read_csv(getRelPath(BASE_PATH, RAW_PATH, 'tweets.csv'), usecols=fields, na_values=na_lst, dtype=dtype, parse_dates=parse_dates, sep ='\t')
