@@ -53,6 +53,8 @@ def calculate_price_change(crypto_data):
     conditions = [crypto_data['Open'] < crypto_data['Close'], crypto_data['Open'] > crypto_data['Close']]
     choices = ['Increased', 'Decreased']
     crypto_data['Price_change'] = np.select(conditions, choices, default='Neutral')
+    crypto_data['Price_change'] = crypto_data['Price_change'].shift(-1)
+    crypto_data.drop(crypto_data.tail(1).index, inplace=True)
     return crypto_data
 
 #########################################################
