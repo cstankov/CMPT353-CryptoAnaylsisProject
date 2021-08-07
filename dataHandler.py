@@ -30,6 +30,7 @@ def process_tweet_data(tweet_data):
     tweet_data = tweet_data.sort_values(by='date', ascending=True).reset_index()
     tweet_data = calculate_average_sentiment(tweet_data)
     tweet_data['date'] = pd.to_datetime(tweet_data['date'])
+     
     tweet_data = tweet_data.rename({'date':'Date'}, axis=1)
     return tweet_data
 
@@ -62,8 +63,11 @@ def calculate_price_change(crypto_data):
 
 def merge_crypto_with_tweets(eth_data, btc_data, tweet_data):
     column_order = ['Date', 'Open', 'High', 'Low', 'Close', 'Adj Close', 'Volume', 'sentiment', 'Price_change']
+
     eth_tweet_data = eth_data.merge(tweet_data, on='Date', how='inner')
+    eth_tweet_data = eth_tweet_data.drop(['Adj Close', 'Date'], axis = 1)
     btc_tweet_data = btc_data.merge(tweet_data, on='Date', how='inner')
+    btc_tweet_data = btc_tweet_data.drop(['Adj Close', 'Date'], axis = 1)
     eth_tweet_data = eth_tweet_data[column_order]
     btc_tweet_data = btc_tweet_data[column_order]
     return eth_tweet_data, btc_tweet_data
