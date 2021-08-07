@@ -36,9 +36,8 @@ def randomForestClassifier(model_data):
     pd.DataFrame(model.cv_results_).to_csv('btc_results_random_forest.csv')
 
 def runModels(eth_data, btc_data):
-    #eth_model_data = splitData(eth_data)
-    #randomForestClassifier(eth_model_data)
+    eth_model_data = splitData(eth_data)
+    randomForestClassifier(eth_model_data)
     btc_model_data = splitData(btc_data)
     randomForestClassifier(btc_model_data)
-    # btc - {'max_depth': 5, 'min_samples_leaf': 1, 'min_samples_split': 2, 'n_estimators': 50}
-    #eth - {'max_depth': 10, 'min_samples_leaf': 10, 'min_samples_split': 2, 'n_estimators': 50}
+    
