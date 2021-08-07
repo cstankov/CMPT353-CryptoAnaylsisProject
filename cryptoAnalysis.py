@@ -11,12 +11,14 @@ from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from dataHandler import *
 from dataVisualization import *
 from sentimentAnalysis import *
+from models import *
 
 
 
 def main():
     print("Preprocesssing data...")
-    preprocess_data()
+    eth_data, bth_data = preprocess_data()
+    runModels(eth_data, bth_data)
 
 if __name__ == '__main__':
     main()
