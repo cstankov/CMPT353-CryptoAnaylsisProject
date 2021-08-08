@@ -11,9 +11,11 @@ from sklearn.model_selection import GridSearchCV
 def runModels(eth_data, btc_data, with_hypertuning=False):
     eth_model_data = split_data(eth_data)
     btc_model_data = split_data(btc_data)
-    random_forest(eth_model_data, btc_model_data, with_hypertuning)
-    neural_network(eth_model_data, btc_model_data, with_hypertuning)
-    gaussian_NB(eth_model_data, btc_model_data, with_hypertuning)
+    # random_forest(eth_model_data, btc_model_data, with_hypertuning)
+    # neural_network(eth_model_data, btc_model_data, with_hypertuning)
+    # gaussian_NB(eth_model_data, btc_model_data, with_hypertuning)
+    linear_regression(eth_model_data, btc_model_data, with_hypertuning)
+
 
 #########################################################
 # Split Data
@@ -97,22 +99,12 @@ def gaussian_NB(eth_data, btc_data, with_hypertuning):
 #########################################################
 # Linear Regression
 
-def linear_regression_classifier(model_data, is_btc=True):
-    X_train, X_valid, y_train, y_valid = model_data[0], model_data[1], model_data[2], model_data[3]
-    feature_names = ['Open', 'High', 'Low', 'Close', 'Volume', 'sentiment']
-    if is_btc == True:
-        title = 'BTC Actual vs Prediction'
-        save_fig = 'BTC-LRC-results.png'
-    else:
-        title = 'ETH actual vs Prediction'
-        save_fig = 'ETH-LCR-results.png'
-    model = LinearRegression()
-    model.fit(X_train[feature_names], y_train)
-    print("Linear Regression train accuracy: ", model.score(X_train[feature_names], y_train))
-    print("Linear Regression valid accuracy: ", model.score(X_valid[feature_names], y_valid))
-    X_test = X_valid
-    X_test['predictions'] = model.predict(X_valid[feature_names])
-    plot_model_results(X_test, y_valid, title, save_fig)
+def linear_regression(eth_data, btc_data, with_hypertuning):
+    model_string = 'linearRegression'
+    if not with_hypertuning:
+        model = LinearRegression()
+        classification(eth_data, model, model_string, is_btc=False)
+        classification(btc_data, model, model_string, is_btc=True)
 
 #########################################################
 # Classification Helper Functions
