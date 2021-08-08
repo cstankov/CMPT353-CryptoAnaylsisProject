@@ -11,11 +11,10 @@ from sklearn.model_selection import GridSearchCV
 def runModels(eth_data, btc_data, with_hypertuning=False):
     eth_model_data = split_data(eth_data)
     btc_model_data = split_data(btc_data)
-    # random_forest(eth_model_data, btc_model_data, with_hypertuning)
-    # neural_network(eth_model_data, btc_model_data, with_hypertuning)
-    # gaussian_NB(eth_model_data, btc_model_data, with_hypertuning)
+    random_forest(eth_model_data, btc_model_data, with_hypertuning)
+    neural_network(eth_model_data, btc_model_data, with_hypertuning)
+    gaussian_NB(eth_model_data, btc_model_data, with_hypertuning)
     linear_regression(eth_model_data, btc_model_data, with_hypertuning)
-
 
 #########################################################
 # Split Data
