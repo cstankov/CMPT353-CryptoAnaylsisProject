@@ -151,7 +151,6 @@ def plot_model_results(X_test, y_test, title, save_fig):
     ax[1].set_ylabel('Predicted Results')
     ax[1].bar(plot_data['Date'],plot_data['predictions'])
     plt.savefig(FIGURE_PATH)
-    plt.show()
 
 def process_model_results(X_test, y_test):
     plot_data = X_test[['Date', 'predictions']]
