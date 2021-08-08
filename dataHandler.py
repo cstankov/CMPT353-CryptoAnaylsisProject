@@ -1,5 +1,8 @@
-from numpy import datetime64, string_
-from cryptoAnalysis import *
+import os
+import numpy as np
+import pandas as pd
+from sentimentAnalysis import sentimentAnalysis
+from dataVisualization import visualize_raw_data
 
 def preprocess_data():
     BASE_PATH = os.path.dirname(__file__)
@@ -12,11 +15,11 @@ def preprocess_data():
         return process_data()
 
 #########################################################
-# PROCESS DATA
+# Process Data
 
 def process_data():
     eth_data, btc_data, tweet_data = loadRawData()
-    visualize_raw_data(eth_data, btc_data, tweet_data) # Display raw data
+    visualize_raw_data(eth_data, btc_data, tweet_data) 
     tweet_data.drop('name', axis=1)
     tweet_data = process_tweet_data(tweet_data)
     eth_data = process_eth_data(eth_data)
@@ -30,7 +33,6 @@ def process_tweet_data(tweet_data):
     tweet_data = tweet_data.sort_values(by='date', ascending=True).reset_index()
     tweet_data = calculate_average_sentiment(tweet_data)
     tweet_data['date'] = pd.to_datetime(tweet_data['date'])
-     
     tweet_data = tweet_data.rename({'date':'Date'}, axis=1)
     return tweet_data
 
@@ -59,11 +61,10 @@ def calculate_price_change(crypto_data):
     return crypto_data
 
 #########################################################
-# MERGE DATA
+# Merge Data
 
 def merge_crypto_with_tweets(eth_data, btc_data, tweet_data):
     column_order = ['Date', 'Open', 'High', 'Low', 'Close', 'Adj Close', 'Volume', 'sentiment', 'Price_change']
-
     eth_tweet_data = eth_data.merge(tweet_data, on='Date', how='inner')
     eth_tweet_data = eth_tweet_data.drop(['Adj Close'], axis = 1)
     btc_tweet_data = btc_data.merge(tweet_data, on='Date', how='inner')
@@ -73,7 +74,7 @@ def merge_crypto_with_tweets(eth_data, btc_data, tweet_data):
     return eth_tweet_data, btc_tweet_data
 
 #########################################################
-# WRITE DATA
+# Write Data
 
 def write_processed_data(eth_tweet_data, btc_tweet_data):
     BASE_PATH = os.path.dirname(__file__)
@@ -82,11 +83,12 @@ def write_processed_data(eth_tweet_data, btc_tweet_data):
     btc_tweet_data.to_csv(getRelPath(BASE_PATH, PROCESSED_PATH,'BTC-USD-Processed.csv'), index=False)
 
 #########################################################
-# LOAD DATA
+# Load Data
 
 def load_preprocessed_data(BASE_PATH, PROCESSED_PATH):
-    eth_data = pd.read_csv(getRelPath(BASE_PATH, PROCESSED_PATH,'ETH-USD-Processed.csv'))
-    btc_data = pd.read_csv(getRelPath(BASE_PATH, PROCESSED_PATH, 'BTC-USD-Processed.csv'))
+    parse_dates=['Date']
+    eth_data = pd.read_csv(getRelPath(BASE_PATH, PROCESSED_PATH,'ETH-USD-Processed.csv'), parse_dates=parse_dates)
+    btc_data = pd.read_csv(getRelPath(BASE_PATH, PROCESSED_PATH, 'BTC-USD-Processed.csv'), parse_dates=parse_dates)
     return eth_data, btc_data
 
 def loadRawData():
@@ -100,7 +102,7 @@ def loadRawData():
 
 def load_raw_btc_data(BASE_PATH, RAW_PATH, na_lst):
     fields = ['Date', 'Open', 'High', 'Low', 'Close', 'Adj Close', 'Volume']
-    return pd.read_csv(getRelPath(BASE_PATH, RAW_PATH, 'BTC-USD.csv'), na_values=na_lst, parse_dates=['Date'])
+    return pd.read_csv(getRelPath(BASE_PATH, RAW_PATH, 'BTC-USD.csv'), usecols=fields, na_values=na_lst, parse_dates=['Date'])
 
 def load_raw_eth_data(BASE_PATH, RAW_PATH, na_lst):
     fields = ['Date', 'Open', 'High', 'Low', 'Close', 'Adj Close', 'Volume']
@@ -116,7 +118,7 @@ def getRelPath(BASE_PATH, PROCESSED_PATH, SUB_PATH):
     return BASE_PATH + PROCESSED_PATH + SUB_PATH
 
 #########################################################
-# DETECTING PROCESSED DATA
+# Detecting Processed Data
 
 def data_already_preprocessed(BASE_PATH, PROCESSED_PATH):
     return ethDatasetPreprocessed(BASE_PATH, PROCESSED_PATH) and \

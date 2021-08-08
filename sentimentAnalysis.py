@@ -1,4 +1,5 @@
-from cryptoAnalysis import *
+import pandas
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
 def getSentimentScore(tweet):
     analyzer = SentimentIntensityAnalyzer()

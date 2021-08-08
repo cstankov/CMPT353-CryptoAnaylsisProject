@@ -1,15 +1,25 @@
-from os import access
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
-from sklearn import svm, datasets
-from sklearn.model_selection import GridSearchCV
-import matplotlib.dates as mdates
-import matplotlib.pyplot as plt
-import datetime
-import numpy as np
+from math import tanh
 import pandas as pd
+from dataVisualization import plot_model_results
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import AdaBoostClassifier
+from sklearn.neural_network import MLPClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+from sklearn.model_selection import GridSearchCV
 
-def convertValue(value):
+def runModels(eth_data, btc_data, with_hypertuning=False):
+    eth_model_data = split_data(eth_data)
+    btc_model_data = split_data(btc_data)
+    random_forest(eth_model_data, btc_model_data, with_hypertuning)
+    neural_network(eth_model_data, btc_model_data, with_hypertuning)
+    gaussian_NB(eth_model_data, btc_model_data, with_hypertuning)
+
+#########################################################
+# Split Data
+
+def convert_value(value):
     if value == 'Increased':
         return 1
     elif value == 'Decreased':
@@ -17,65 +27,121 @@ def convertValue(value):
     else:
         return 0
 
-def splitData(data):
+def split_data(data):
     X = data.iloc[:, data.columns != 'Price_change']
     price_change = data['Price_change']
-    y = price_change.apply(convertValue)
-
+    y = price_change.apply(convert_value)
     X_train, X_valid, y_train, y_valid = train_test_split(X, y)
     return [X_train, X_valid, y_train, y_valid]
 
-def plotResults(X_test, y_test):
-    plot_data = X_test[['Date', 'predictions']]
-    plot_data = pd.concat([plot_data, y_test], axis = 1)
-    plot_data['Actual'] = plot_data['Price_change']
-    plot_data = plot_data.drop('Price_change', axis = 1)
-    plot_data = plot_data.sort_values('Date')
-    print(plot_data)
-    years = mdates.YearLocator()
-    
-    fig1, ax1 = plt.subplots(111)
-    plt.bar(plot_data['Date'],plot_data['Actual'])
-    plt.xaxis.set_major_locator(years)
-    fig2, ax2 = plt.subplots(212)
-    plt.bar(plot_data['Date'],plot_data['predictions'])
-    plt.xaxis.set_major_locator(years)
-    plt.xticks(rotation = 45)
-    plt.show()
+#########################################################
+# Random Forest Classifier
 
-def randomForestClassifier(model_data, is_btc = True):
+def random_forest(eth_data, btc_data, with_hypertuning):
+    model_string = 'Random-Forest'
+    if with_hypertuning:
+        parameters = {
+            'n_estimators':[50, 200, 350, 500], 
+            'max_depth':[5, 7, 10, 12], 
+            'min_samples_leaf':[1, 5, 10], 
+            'min_samples_split':[2, 6, 10]
+            }
+        model = RandomForestClassifier()
+        hyper_tuning(eth_data, model, model_string, parameters, is_btc=False)
+        hyper_tuning(btc_data, model, model_string, parameters, is_btc=True)
+    else:
+        model_btc = RandomForestClassifier(max_depth= 5, min_samples_leaf = 1, min_samples_split = 2, n_estimators = 50)
+        model_eth = RandomForestClassifier(max_depth= 10, min_samples_leaf = 10, min_samples_split = 2, n_estimators = 50)
+        classification(eth_data, model_eth, model_string, is_btc=False)
+        classification(btc_data, model_btc, model_string, is_btc=True)
+
+#########################################################
+# Neural Network Classifier
+
+def neural_network(eth_data, btc_data, with_hypertuning):
+    model_string = 'Multi-layer_perceptron'
+    if with_hypertuning:
+        parameters = {
+            'learning_rate_init': [0.0001, 0.001, 0.01],
+            'max_iter': [300],
+            'hidden_layer_sizes': [(500, 400, 300, 200, 100), (400, 400, 400, 400, 400), (300, 300, 300, 300, 300), (200, 200, 200, 200, 200)],
+            'activation': ['logistic', 'tanh', 'relu'],
+            'alpha': [0.0001, 0.001, 0.005],
+            'early_stopping': [True, False]
+            }
+        model = MLPClassifier()
+        hyper_tuning(eth_data, model, model_string, parameters, is_btc=False)
+        hyper_tuning(btc_data, model, model_string, parameters, is_btc=True)
+    else:
+        model_btc = MLPClassifier(activation='logistic', alpha= 0.0001, early_stopping=True, hidden_layer_sizes= (500, 400, 300, 200, 100), learning_rate_init=0.0001, max_iter=300)
+        model_eth = MLPClassifier(activation='tanh', alpha=0.005, early_stopping=True, hidden_layer_sizes=(200,200,200,200,200), learning_rate_init=0.01, max_iter=300)
+        classification(eth_data, model_eth, model_string, is_btc=False)
+        classification(btc_data, model_btc, model_string, is_btc=True)
+
+#########################################################
+# Gaussian Naive Bayes Classifier
+
+def gaussian_NB(eth_data, btc_data, with_hypertuning):
+    model_string = 'gaussianNB'
+    if with_hypertuning:
+        parameters = {
+            'var_smoothing': [0.000000001, 0.00000001, 0.0000001, 0.000001]
+            }
+        model = GaussianNB()
+        hyper_tuning(eth_data, model, model_string, parameters, is_btc=False)
+        hyper_tuning(btc_data, model, model_string, parameters, is_btc=True)
+    else:
+        model = GaussianNB()
+        classification(eth_data, model, model_string, is_btc=False)
+        classification(btc_data, model, model_string, is_btc=True)
+
+#########################################################
+# Linear Regression
+
+def linear_regression_classifier(model_data, is_btc=True):
     X_train, X_valid, y_train, y_valid = model_data[0], model_data[1], model_data[2], model_data[3]
     feature_names = ['Open', 'High', 'Low', 'Close', 'Volume', 'sentiment']
     if is_btc == True:
-        model = RandomForestClassifier(max_depth= 5, min_samples_leaf = 1, min_samples_split = 2, n_estimators = 50)
+        title = 'BTC Actual vs Prediction'
+        save_fig = 'BTC-LRC-results.png'
     else:
-        model = RandomForestClassifier(max_depth= 10, min_samples_leaf = 10, min_samples_split = 2, n_estimators = 50)
+        title = 'ETH actual vs Prediction'
+        save_fig = 'ETH-LCR-results.png'
+    model = LinearRegression()
     model.fit(X_train[feature_names], y_train)
-    #print(model.score(X_train[feature_names], y_train))
-    #print(model.score(X_valid[feature_names], y_valid))
-    #print(model.predict(X_valid[feature_names]))
-   
+    print("Linear Regression train accuracy: ", model.score(X_train[feature_names], y_train))
+    print("Linear Regression valid accuracy: ", model.score(X_valid[feature_names], y_valid))
     X_test = X_valid
     X_test['predictions'] = model.predict(X_valid[feature_names])
-    plotResults(X_test, y_valid)
+    plot_model_results(X_test, y_valid, title, save_fig)
 
-def randomForestHyperTuning(model_data):
+#########################################################
+# Classification Helper Functions
+
+def classification(model_data, model, model_string, is_btc=True):
     X_train, X_valid, y_train, y_valid = model_data[0], model_data[1], model_data[2], model_data[3]
-    parameters = {
-        'n_estimators':[50, 200, 350, 500], 
-        'max_depth':[5, 7, 10, 12], 
-        'min_samples_leaf':[1, 5, 10], 
-        'min_samples_split':[2, 6, 10]}
-    rfc = RandomForestClassifier()
-    model = GridSearchCV(rfc, parameters)
-    model.fit(X_train, y_train)
-    print(model.score(X_train, y_train))
-    print(model.score(X_valid, y_valid))
-    print(model.cv_results_)
-    pd.DataFrame(model.cv_results_).to_csv('btc_results_random_forest.csv')
+    feature_names = ['Open', 'High', 'Low', 'Close', 'Volume', 'sentiment']
+    if is_btc == True:
+        title = 'BTC Actual vs Prediction'
+        save_fig = 'BTC-' + model_string + '-results.png'
+    else:
+        title = 'ETH actual vs Prediction'
+        save_fig = 'ETH-' + model_string + '-results.png'
+    model.fit(X_train[feature_names], y_train)
+    print(model_string + " train accuracy: ", model.score(X_train[feature_names], y_train))
+    print(model_string + " valid accuracy: ", model.score(X_valid[feature_names], y_valid))
+    X_test = X_valid
+    X_test['predictions'] = model.predict(X_valid[feature_names])
+    plot_model_results(X_test, y_valid, title, save_fig)
 
-def runModels(eth_data, btc_data):
-    eth_model_data = splitData(eth_data)
-    randomForestClassifier(eth_model_data, is_btc = False)
-    btc_model_data = splitData(btc_data)
-    randomForestClassifier(btc_model_data)
+def hyper_tuning(model_data, model, model_string, parameters, is_btc=True):
+    X_train, X_valid, y_train, y_valid = model_data[0], model_data[1], model_data[2], model_data[3]
+    feature_names = ['Open', 'High', 'Low', 'Close', 'Volume', 'sentiment']
+    gridcv = GridSearchCV(model, parameters)
+    gridcv.fit(X_train[feature_names], y_train)
+    print(model_string + " train accuracy: ", gridcv.score(X_train[feature_names], y_train))
+    print(model_string + " valid accuracy: ", gridcv.score(X_valid[feature_names], y_valid))
+    if is_btc:
+        pd.DataFrame(gridcv.cv_results_).to_csv('model_data/btc_results_' + model_string + '.csv')
+    else:
+        pd.DataFrame(gridcv.cv_results_).to_csv('model_data/eth_results_' + model_string + '.csv')

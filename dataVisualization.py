@@ -1,6 +1,8 @@
-from numpy.lib.function_base import rot90
-from dataHandler import *
-from cryptoAnalysis import *
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 
 def visualize_raw_data(eth_data, btc_data, tweet_data):
     FIGURE_PATH = 'figures/'
@@ -9,7 +11,7 @@ def visualize_raw_data(eth_data, btc_data, tweet_data):
     visualize_tweet_raw_data(tweet_data, FIGURE_PATH)
 
 #########################################################
-# Tweet Visualization
+# Tweet Raw Visualization
 
 def visualize_tweet_raw_data(tweet_data, FIGURE_PATH):
     print("Tweet dataset headers: ", tweet_data.columns.tolist())
@@ -71,7 +73,7 @@ def plot_tweets_per_year(tweet_data, FIGURE_PATH):
     plt.savefig(FIGURE_PATH)
 
 #########################################################
-# ETH Visualization
+# ETH Raw Visualization
 
 def visualize_eth_raw_data(eth_data, FIGURE_PATH):
     print("Ethereum dataset headers: ", eth_data.columns.tolist())
@@ -82,7 +84,7 @@ def visualize_eth_raw_data(eth_data, FIGURE_PATH):
     plot_crypto_volume(eth_data, FIGURE_PATH + 'ETH-volume.png', 'Volume of Ethereum')
 
 #########################################################
-# BTC Visualization
+# BTC Raw Visualization
 
 def visualize_btc_raw_data(btc_data, FIGURE_PATH):
     print("Bitcoin dataset headers: ", btc_data.columns.tolist())
@@ -93,7 +95,7 @@ def visualize_btc_raw_data(btc_data, FIGURE_PATH):
     plot_crypto_volume(btc_data, FIGURE_PATH + 'BTC-volume.png', 'Volume of Bitcoin')
 
 #########################################################
-# Crypto Visualization
+# Crypto Raw Visualization
 
 def plot_crypto_opening_price(eth_data, FIGURE_PATH, title):
     plt.clf()
@@ -129,6 +131,37 @@ def plot_crypto_volume(eth_data, FIGURE_PATH, title):
     plt.xlabel('Date')
     plt.ylabel('Price')
     plt.savefig(FIGURE_PATH)
+
+#########################################################
+# Visualize Model Results
+
+def plot_model_results(X_test, y_test, title, save_fig):
+    FIGURE_PATH = 'figures/'
+    FIGURE_PATH += save_fig
+    plot_data = process_model_results(X_test, y_test)
+    years = mdates.YearLocator()
+    fig, ax = plt.subplots(2)
+    fig.suptitle(title)
+    fig.tight_layout(pad=2.0)
+    plt.gca().xaxis.set_major_locator(years)
+    ax[0].set_xlabel('Date')
+    ax[0].set_ylabel('Actual Results')
+    ax[0].bar(plot_data['Date'], plot_data['Actual'])
+    ax[1].set_xlabel('Date')
+    ax[1].set_ylabel('Predicted Results')
+    ax[1].bar(plot_data['Date'],plot_data['predictions'])
+    plt.savefig(FIGURE_PATH)
+    plt.show()
+
+def process_model_results(X_test, y_test):
+    plot_data = X_test[['Date', 'predictions']]
+    plot_data = pd.concat([plot_data, y_test], axis = 1)
+    plot_data['Actual'] = plot_data['Price_change']
+    plot_data = plot_data.drop('Price_change', axis = 1)
+    plot_data = plot_data.sort_values('Date')
+    plot_data['Actual'] = np.where(plot_data['Actual'] == -1, 0, plot_data['Actual'])
+    plot_data['predictions'] = np.where(plot_data['predictions'] == -1, 0, plot_data['predictions'])
+    return plot_data
 
 #########################################################
 # Helper Functions
