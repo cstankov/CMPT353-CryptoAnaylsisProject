@@ -94,5 +94,5 @@ def runTests(eth_data, btc_data):
     dayByDayTest(eth_data, btc_data)
     chiSquareTest(eth_data)
     chiSquareTest(btc_data)
-    dayByDayTest(eth_data)
-    dayByDayTest(btc_data)
+    dayByDayTest2(eth_data)
+    dayByDayTest2(btc_data)
