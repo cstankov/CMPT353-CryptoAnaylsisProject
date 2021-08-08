@@ -2,7 +2,6 @@ from math import tanh
 import pandas as pd
 from dataVisualization import plot_model_results
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.ensemble import AdaBoostClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.linear_model import LinearRegression
