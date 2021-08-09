@@ -7,6 +7,7 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import GridSearchCV
+from sklearn.metrics import classification_report
 
 def runModels(eth_data, btc_data, with_hypertuning=False):
     eth_model_data = split_data(eth_data)
@@ -103,13 +104,13 @@ def linear_regression(eth_data, btc_data, with_hypertuning):
     model_string = 'linearRegression'
     if not with_hypertuning:
         model = LinearRegression()
-        classification(eth_data, model, model_string, is_btc=False)
-        classification(btc_data, model, model_string, is_btc=True)
+        classification(eth_data, model, model_string, is_btc=False, is_linear_regression=True)
+        classification(btc_data, model, model_string, is_btc=True, is_linear_regression=True)
 
 #########################################################
 # Classification Helper Functions
 
-def classification(model_data, model, model_string, is_btc=True):
+def classification(model_data, model, model_string, is_btc=True, is_linear_regression=False):
     X_train, X_valid, y_train, y_valid = model_data[0], model_data[1], model_data[2], model_data[3]
     feature_names = ['Open', 'High', 'Low', 'Close', 'Volume', 'sentiment']
     if is_btc == True:
@@ -123,7 +124,14 @@ def classification(model_data, model, model_string, is_btc=True):
     print(model_string + " valid accuracy: ", model.score(X_valid[feature_names], y_valid))
     X_test = X_valid
     X_test['predictions'] = model.predict(X_valid[feature_names])
+    if not is_linear_regression:
+        get_evaluation_metrics(X_test['predictions'], y_valid)
     plot_model_results(X_test, y_valid, title, save_fig)
+
+def get_evaluation_metrics(predicted, true_values):
+    target_names = ['Increased', 'Decreased']
+    eval_metrics = classification_report(true_values, predicted, target_names=target_names, zero_division=1)
+    print(eval_metrics)
 
 def hyper_tuning(model_data, model, model_string, parameters, is_btc=True):
     X_train, X_valid, y_train, y_valid = model_data[0], model_data[1], model_data[2], model_data[3]
