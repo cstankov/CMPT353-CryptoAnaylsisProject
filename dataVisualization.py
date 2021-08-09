@@ -9,6 +9,7 @@ def visualize_raw_data(eth_data, btc_data, tweet_data):
     visualize_eth_raw_data(eth_data, FIGURE_PATH)
     visualize_btc_raw_data(btc_data, FIGURE_PATH)
     visualize_tweet_raw_data(tweet_data, FIGURE_PATH)
+    visualize_eth_vs_btc(eth_data, btc_data, FIGURE_PATH)
 
 #########################################################
 # Tweet Raw Visualization
@@ -38,9 +39,9 @@ def plot_likes_count_with_outliers(tweet_data, FIGURE_PATH):
 
 def plot_likes_count_reduced_outliers(tweet_data, FIGURE_PATH):
     plt.clf()
-    removed_outliers = tweet_data[tweet_data['likes_count'] < 500]
-    plt.boxplot(removed_outliers['likes_count'])
-    plt.title('Number of likes for the tweets reduced outliers')
+    removed_outliers = np.log(tweet_data['likes_count'])
+    plt.boxplot(removed_outliers)
+    plt.title('Number of likes for the tweets reduced outliers (log)')
     plt.xlabel('Like Number range')
     plt.ylabel('Count')
     plt.savefig(FIGURE_PATH)
@@ -71,6 +72,14 @@ def plot_tweets_per_year(tweet_data, FIGURE_PATH):
     date = tweet_data.groupby(tweet_data.date.dt.year).sum().reset_index()
     plt.bar(date['date'], date['likes_count'])
     plt.savefig(FIGURE_PATH)
+
+#########################################################
+# ETH compared to BTC Raw Visualization
+
+def visualize_eth_vs_btc(eth_data, btc_data, FIGURE_PATH):
+    plot_crypto_btc_vs_eth_log(eth_data, btc_data, FIGURE_PATH + 'ETH-vs-BTC-close.png', 'BTC Vs ETH Closing Price (log)', 'Close')
+    plot_crypto_btc_vs_eth_log(eth_data, btc_data, FIGURE_PATH + 'ETH-vs-BTC-open.png', 'BTC Vs ETH Opening Price (log)', 'Open')
+    plot_crypto_btc_vs_eth_log(eth_data, btc_data, FIGURE_PATH + 'ETH-vs-BTC-volume.png', 'BTC Vs ETH Volume (log)', 'Volume')
 
 #########################################################
 # ETH Raw Visualization
@@ -118,6 +127,30 @@ def plot_crypto_high_vs_low(data, FIGURE_PATH, title):
     temp_data = data[data['Date'] > '2021-01-01']
     plt.plot(temp_data['Date'], temp_data['High'], label = "High")
     plt.plot(temp_data['Date'], temp_data['Low'], label = "Low")
+    plt.title(title)
+    plt.xlabel('Date')
+    plt.ylabel('Price')
+    plt.legend()
+    plt.savefig(FIGURE_PATH)
+
+def plot_crypto_btc_vs_eth_log(eth_data, btc_data, FIGURE_PATH, title, column):
+    plt.clf()
+    years = mdates.YearLocator()
+    plt.gca().xaxis.set_major_locator(years)
+    plt.plot(eth_data['Date'], np.log(eth_data[column]), label = "ETH")
+    plt.plot(btc_data['Date'], np.log(btc_data[column]), label = "BTC")
+    plt.title(title)
+    plt.xlabel('Date')
+    plt.ylabel('Price')
+    plt.legend()
+    plt.savefig(FIGURE_PATH)
+
+def plot_crypto_btc_vs_eth(eth_data, btc_data, FIGURE_PATH, title, column):
+    plt.clf()
+    years = mdates.YearLocator()
+    plt.gca().xaxis.set_major_locator(years)
+    plt.plot(eth_data['Date'], eth_data[column], label = "ETH")
+    plt.plot(btc_data['Date'], btc_data[column], label = "BTC")
     plt.title(title)
     plt.xlabel('Date')
     plt.ylabel('Price')
