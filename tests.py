@@ -3,20 +3,90 @@ from statsmodels.stats.contingency_tables import mcnemar
 import pandas as pd
 from scipy import stats
 
-def getContingencyTable(eth_data, btc_data):
+def run_tests(eth_data, btc_data):
+    mc_nemars(eth_data, btc_data)
+    compare_price_change_btc_eth(eth_data, btc_data)
+    chi_square_test(eth_data)
+    chi_square_test(btc_data)
+    compare_sentiment_with_price_change(eth_data)
+    compare_sentiment_with_price_change(btc_data)
+
+#########################################################
+# Mc Nemars Test
+# - Mc Nemars test ran on BTC and ETH if it incresed and decreased
+#   the same amount. Low PValue shows that it BTC and ETH increase and decrease 
+#   at a similar rate.
+
+def mc_nemars(eth_data, btc_data):
+    contingency = get_contingency_table_for_mcnemar(eth_data, btc_data)
+    print(contingency)
+    print("Pvalue for McNemar's Test:", mcnemar(contingency).pvalue)
+
+def get_contingency_table_for_mcnemar(eth_data, btc_data):
     eth_data['Symbol'] = 'ETH'
     eth_data = eth_data[['Price_change', 'Symbol']]
     btc_data['Symbol'] = 'BTC'
     btc_data = btc_data[['Price_change', 'Symbol']]
-    frames = [eth_data, btc_data]
-    data = pd.concat(frames).reset_index(drop = True)
-    contingency = pd.crosstab(data['Symbol'], data['Price_change'])
-    return contingency
+    data = pd.concat([eth_data, btc_data]).reset_index(drop = True)
+    return pd.crosstab(data['Symbol'], data['Price_change'])
 
-def mcNemars(eth_data, btc_data):
-    contingency = getContingencyTable(eth_data, btc_data)
-    print(contingency)
-    print("Pvalue for McNemar's Test:", mcnemar(contingency).pvalue)
+#########################################################
+# BTC and ETH day by day comparing the Price_change Test
+# - Percentage of days where both BTC and ETH had a net increase or decrease
+
+def compare_price_change_btc_eth(eth_data, btc_data):
+    data = pd.concat([eth_data['Price_change'], btc_data['Price_change']], axis = 1)
+    columns = ['Price_change_ETH', 'Price_change_BTC']
+    data.columns = columns
+    equal_count = data.apply(lambda x:is_equal(x), axis = 1)
+    print("Comparison of the price change between BTC and ETH test (%): ", equal_count.value_counts()/ len(equal_count))
+
+def is_equal(x):
+    if x['Price_change_ETH'] == x['Price_change_BTC']:
+        return "Directly Proportional"
+    else:
+        return "Indirectly Proportional"
+
+#########################################################
+# Chi Square Test
+# - Comparing sentiment score with price change. If PValue is 
+#   small there is a correlation between the number of sentiment scores
+#   to price change  
+
+def chi_square_test(data):
+    contingency = get_contingency(data) 
+    chi2, p, dof, expected = stats.chi2_contingency(contingency)
+    print("Pvalue for chi squared test: ", p)
+
+def get_contingency(data):
+    data = convert_data(data)
+    new1 = data[['sentiment']]
+    new1 = new1.rename(columns={"sentiment": "value"})
+    new1['type'] = 'sentiment'
+    new2 = data[['Price_change']]
+    new2 = new2.rename(columns={"Price_change": "value"})
+    new2['type'] = 'Price_change'
+    data = pd.concat([new1, new2]).reset_index(drop = True)
+    return pd.crosstab(data['type'], data['value'])
+
+#########################################################
+#  Comparing sentiment score with price increase per day Test
+
+def compare_sentiment_with_price_change(data):
+    data = convert_data(data)
+    temp = data.copy()
+    temp['is_equal'] = data.apply(lambda x: is_equal2(x), axis = 1)
+    print("Comparison of the price change between sentiment score and Price_change test (%): ", temp['is_equal'].value_counts()/ len(temp))
+
+#########################################################
+#  Helper Functions
+
+def convert_data(data):
+    data = data[['sentiment', 'Price_change']]
+    temp = data.copy()
+    temp['Price_change'] = data['Price_change'].apply(convertPriceChange)
+    temp['sentiment'] = data['sentiment'].apply(convertSentiment)
+    return temp
 
 def convertPriceChange(value):
     if value == 'Increased':
@@ -34,65 +104,8 @@ def convertSentiment(value):
     else:
         return 0
 
-def is_equal(x):
-    if x['sentiment'] == x['Price_change']:
-        return "Directly Proportional"
-    else:
-        return "Indirectly Proportional"
-
-def is_equal(x):
-    if x['Price_change_ETH'] == x['Price_change_BTC']:
-        return "Directly Proportional"
-    else:
-        return "Indirectly Proportional"
-
-def dayByDayTest(eth_data, btc_data):
-    data = pd.concat([eth_data['Price_change'], btc_data['Price_change']], axis = 1)
-    columns = ['Price_change_ETH', 'Price_change_BTC']
-    data.columns = columns
-    is_equal_ = data.apply(lambda x:is_equal(x), axis = 1)
-    print(is_equal_.value_counts())
-
 def is_equal2(x):
     if x['sentiment'] == x['Price_change']:
         return "Directly Proportional"
     else:
         return "Indirectly Proportional"
-
-def convertData(data):
-    data = data[['sentiment', 'Price_change']]
-    data['Price_change'] = data['Price_change'].apply(convertPriceChange)
-    data['sentiment'] = data['sentiment'].apply(convertSentiment)
-    return data
-
-def dayByDayTest2(data):
-    data = convertData(data)
-    is_equal_ = data.apply(lambda x:is_equal2(x), axis = 1)
-    print(is_equal_.value_counts())
-    
-def getContingency(data):
-    data = convertData(data)
-    new1 = data[['sentiment']]
-    new1 = new1.rename(columns={"sentiment": "value"})
-    new1['type'] = 'sentiment'
-    new2 = data[['Price_change']]
-    new2 = new2.rename(columns={"Price_change": "value"})
-    new2['type'] = 'Price_change'
-    frames = [new1, new2]
-    data = pd.concat(frames).reset_index(drop = True)
-    contingency = pd.crosstab(data['type'], data['value'])
-    return contingency
-
-def chiSquareTest(data):
-    contingency = getContingency(data) 
-    chi2, p, dof, expected = stats.chi2_contingency(contingency)
-    print("Pvalue for chi squared test: ", p)
-    #print(expected)
-
-def runTests(eth_data, btc_data):
-    mcNemars(eth_data, btc_data)
-    dayByDayTest(eth_data, btc_data)
-    chiSquareTest(eth_data)
-    chiSquareTest(btc_data)
-    dayByDayTest2(eth_data)
-    dayByDayTest2(btc_data)

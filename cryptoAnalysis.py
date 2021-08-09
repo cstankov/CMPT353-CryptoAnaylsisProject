@@ -1,6 +1,6 @@
 from dataHandler import preprocess_data
 from models import runModels
-from tests import runTests
+from tests import run_tests
 
 def main():
     #print("Preprocesssing data...")
@@ -8,7 +8,7 @@ def main():
     #print("Building Models...")
     # runModels(eth_data, bth_data, with_hypertuning=True)
     #runModels(eth_data, bth_data, with_hypertuning=False)
-    runTests(eth_data, bth_data)
+    run_tests(eth_data, bth_data)
 
 if __name__ == '__main__':
     main()

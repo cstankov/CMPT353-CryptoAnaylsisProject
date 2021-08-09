@@ -97,25 +97,25 @@ def visualize_btc_raw_data(btc_data, FIGURE_PATH):
 #########################################################
 # Crypto Raw Visualization
 
-def plot_crypto_opening_price(eth_data, FIGURE_PATH, title):
+def plot_crypto_opening_price(data, FIGURE_PATH, title):
     plt.clf()
-    plt.plot(eth_data['Date'], eth_data['Open'])
+    plt.plot(data['Date'], data['Open'])
     plt.title(title)
     plt.xlabel('Date')
     plt.ylabel('Price')
     plt.savefig(FIGURE_PATH)
 
-def plot_crypto_closing_price(eth_data, FIGURE_PATH, title):
+def plot_crypto_closing_price(data, FIGURE_PATH, title):
     plt.clf()
-    plt.plot(eth_data['Date'], eth_data['Close'])
+    plt.plot(data['Date'], data['Close'])
     plt.title(title)
     plt.xlabel('Date')
     plt.ylabel('Price')
     plt.savefig(FIGURE_PATH)
 
-def plot_crypto_high_vs_low(eth_data, FIGURE_PATH, title):
+def plot_crypto_high_vs_low(data, FIGURE_PATH, title):
     plt.clf()
-    temp_data = eth_data[eth_data['Date'] > '2021-01-01']
+    temp_data = data[data['Date'] > '2021-01-01']
     plt.plot(temp_data['Date'], temp_data['High'], label = "High")
     plt.plot(temp_data['Date'], temp_data['Low'], label = "Low")
     plt.title(title)
@@ -124,9 +124,9 @@ def plot_crypto_high_vs_low(eth_data, FIGURE_PATH, title):
     plt.legend()
     plt.savefig(FIGURE_PATH)
 
-def plot_crypto_volume(eth_data, FIGURE_PATH, title):
+def plot_crypto_volume(data, FIGURE_PATH, title):
     plt.clf()
-    plt.plot(eth_data['Date'], eth_data['Volume'])
+    plt.plot(data['Date'], data['Volume'])
     plt.title(title)
     plt.xlabel('Date')
     plt.ylabel('Price')
