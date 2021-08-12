@@ -168,9 +168,25 @@ def plot_crypto_volume(data, FIGURE_PATH, title):
 #########################################################
 # Visualize Model Results
 
+def plot_linear_regression_results(X_test, y_test, title, save_fig):
+    FIGURE_PATH = 'figures/'
+    FIGURE_PATH += save_fig
+    plot_data = X_test[['Date', 'predictions']]
+    plot_data = pd.concat([plot_data, y_test], axis = 1)
+    plot_data = plot_data.sort_values('Date')
+    plt.clf()
+    plt.title(title)
+    plt.xlabel('Date')
+    plt.ylabel('Price')
+    plt.plot(plot_data['Date'], plot_data['predictions'], label='Prediction')
+    plt.plot(plot_data['Date'], plot_data['Close'], label='Actual')
+    plt.savefig(FIGURE_PATH)
+
+
 def plot_model_results(X_test, y_test, title, save_fig):
     FIGURE_PATH = 'figures/'
     FIGURE_PATH += save_fig
+    plt.clf()
     plot_data = process_model_results(X_test, y_test)
     years = mdates.YearLocator()
     fig, ax = plt.subplots(2)
@@ -194,6 +210,29 @@ def process_model_results(X_test, y_test):
     plot_data['Actual'] = np.where(plot_data['Actual'] == -1, 0, plot_data['Actual'])
     plot_data['predictions'] = np.where(plot_data['predictions'] == -1, 0, plot_data['predictions'])
     return plot_data
+
+#########################################################
+# Overfitting visualizations
+
+def plot_overfitting_for_models(overfitting_points, title, save_fig):
+    ETH_FIGURE_PATH = 'figures/eth-' +  save_fig
+    BTC_FIGURE_PATH = 'figures/btc-' +  save_fig
+    plt.clf()
+    plt.title('Ethereum - ' + title)
+    plt.xlabel('Iteration')
+    plt.ylabel('Accuracy')
+    plt.plot(overfitting_points.index.values, overfitting_points['eth_train_acc'], label='Eth train')
+    plt.plot(overfitting_points.index.values, overfitting_points['eth_valid_acc'], label='Eth valid')
+    plt.legend()
+    plt.savefig(ETH_FIGURE_PATH)
+    plt.clf()
+    plt.title('Bitcoin - ' + title)
+    plt.xlabel('Iteration')
+    plt.ylabel('Accuracy')
+    plt.plot(overfitting_points.index.values, overfitting_points['btc_train_acc'], label='Btc train')
+    plt.plot(overfitting_points.index.values, overfitting_points['btc_valid_acc'], label='Btc valid')
+    plt.legend()
+    plt.savefig(BTC_FIGURE_PATH)
 
 #########################################################
 # Helper Functions

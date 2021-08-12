@@ -56,15 +56,15 @@ def calculate_price_change(crypto_data):
     conditions = [crypto_data['Open'] < crypto_data['Close'], crypto_data['Open'] > crypto_data['Close']]
     choices = ['Increased', 'Decreased']
     crypto_data['Price_change'] = np.select(conditions, choices, default='Neutral')
-    crypto_data['Price_change'] = crypto_data['Price_change'].shift(-1)
-    crypto_data.drop(crypto_data.tail(1).index, inplace=True)
+    # crypto_data['Price_change'] = crypto_data['Price_change'].shift(-1)
+    # crypto_data.drop(crypto_data.tail(1).index, inplace=True)
     return crypto_data
 
 #########################################################
 # Merge Data
 
 def merge_crypto_with_tweets(eth_data, btc_data, tweet_data):
-    column_order = ['Date', 'Open', 'High', 'Low', 'Close', 'Adj Close', 'Volume', 'sentiment', 'Price_change']
+    column_order = ['Date', 'Open', 'High', 'Low', 'Close', 'Volume', 'sentiment', 'Price_change']
     eth_tweet_data = eth_data.merge(tweet_data, on='Date', how='inner')
     eth_tweet_data = eth_tweet_data.drop(['Adj Close'], axis = 1)
     btc_tweet_data = btc_data.merge(tweet_data, on='Date', how='inner')
