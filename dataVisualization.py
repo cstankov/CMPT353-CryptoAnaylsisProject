@@ -35,7 +35,8 @@ def plot_likes_count_with_outliers(tweet_data, FIGURE_PATH):
     plt.title('Number of likes for the tweets')
     plt.xlabel('Like Number range')
     plt.ylabel('Count')
-    plt.savefig(FIGURE_PATH)    
+    plt.savefig(FIGURE_PATH)
+    plt.close()
 
 def plot_likes_count_reduced_outliers(tweet_data, FIGURE_PATH):
     plt.clf()
@@ -45,6 +46,7 @@ def plot_likes_count_reduced_outliers(tweet_data, FIGURE_PATH):
     plt.xlabel('Like Number range')
     plt.ylabel('Count')
     plt.savefig(FIGURE_PATH)
+    plt.close()
 
 def plot_total_number_of_likes(tweet_data, FIGURE_PATH):
     plt.clf()
@@ -54,6 +56,7 @@ def plot_total_number_of_likes(tweet_data, FIGURE_PATH):
     plt.ylabel('Total Likes Count')
     plt.bar(users.index.values, users['likes_count'])
     plt.savefig(FIGURE_PATH)
+    plt.close()
 
 def plot_number_of_users_tweets(tweet_data, FIGURE_PATH):
     plt.clf()
@@ -63,6 +66,7 @@ def plot_number_of_users_tweets(tweet_data, FIGURE_PATH):
     plt.xlabel('User ID')
     plt.ylabel('Count')
     plt.savefig(FIGURE_PATH)
+    plt.close()
 
 def plot_tweets_per_year(tweet_data, FIGURE_PATH):
     plt.clf()
@@ -72,6 +76,7 @@ def plot_tweets_per_year(tweet_data, FIGURE_PATH):
     date = tweet_data.groupby(tweet_data.date.dt.year).sum().reset_index()
     plt.bar(date['date'], date['likes_count'])
     plt.savefig(FIGURE_PATH)
+    plt.close()
 
 #########################################################
 # ETH compared to BTC Raw Visualization
@@ -113,6 +118,7 @@ def plot_crypto_opening_price(data, FIGURE_PATH, title):
     plt.xlabel('Date')
     plt.ylabel('Price')
     plt.savefig(FIGURE_PATH)
+    plt.close()
 
 def plot_crypto_closing_price(data, FIGURE_PATH, title):
     plt.clf()
@@ -121,6 +127,7 @@ def plot_crypto_closing_price(data, FIGURE_PATH, title):
     plt.xlabel('Date')
     plt.ylabel('Price')
     plt.savefig(FIGURE_PATH)
+    plt.close()
 
 def plot_crypto_high_vs_low(data, FIGURE_PATH, title):
     plt.clf()
@@ -132,6 +139,7 @@ def plot_crypto_high_vs_low(data, FIGURE_PATH, title):
     plt.ylabel('Price')
     plt.legend()
     plt.savefig(FIGURE_PATH)
+    plt.close()
 
 def plot_crypto_btc_vs_eth_log(eth_data, btc_data, FIGURE_PATH, title, column):
     plt.clf()
@@ -144,6 +152,7 @@ def plot_crypto_btc_vs_eth_log(eth_data, btc_data, FIGURE_PATH, title, column):
     plt.ylabel('Price')
     plt.legend()
     plt.savefig(FIGURE_PATH)
+    plt.close()
 
 def plot_crypto_btc_vs_eth(eth_data, btc_data, FIGURE_PATH, title, column):
     plt.clf()
@@ -156,6 +165,7 @@ def plot_crypto_btc_vs_eth(eth_data, btc_data, FIGURE_PATH, title, column):
     plt.ylabel('Price')
     plt.legend()
     plt.savefig(FIGURE_PATH)
+    plt.close()
 
 def plot_crypto_volume(data, FIGURE_PATH, title):
     plt.clf()
@@ -164,6 +174,7 @@ def plot_crypto_volume(data, FIGURE_PATH, title):
     plt.xlabel('Date')
     plt.ylabel('Price')
     plt.savefig(FIGURE_PATH)
+    plt.close()
 
 #########################################################
 # Visualize Model Results
@@ -180,7 +191,9 @@ def plot_linear_regression_results(X_test, y_test, title, save_fig):
     plt.ylabel('Price')
     plt.plot(plot_data['Date'], plot_data['predictions'], label='Prediction')
     plt.plot(plot_data['Date'], plot_data['Close'], label='Actual')
+    plt.legend()
     plt.savefig(FIGURE_PATH)
+    plt.close()
 
 
 def plot_model_results(X_test, y_test, title, save_fig):
@@ -200,6 +213,7 @@ def plot_model_results(X_test, y_test, title, save_fig):
     ax[1].set_ylabel('Predicted Results')
     ax[1].bar(plot_data['Date'],plot_data['predictions'])
     plt.savefig(FIGURE_PATH)
+    plt.close()
 
 def process_model_results(X_test, y_test):
     plot_data = X_test[['Date', 'predictions']]
@@ -215,24 +229,18 @@ def process_model_results(X_test, y_test):
 # Overfitting visualizations
 
 def plot_overfitting_for_models(overfitting_points, title, save_fig):
-    ETH_FIGURE_PATH = 'figures/eth-' +  save_fig
-    BTC_FIGURE_PATH = 'figures/btc-' +  save_fig
+    FIGURE_PATH = 'figures/' +  save_fig
     plt.clf()
-    plt.title('Ethereum - ' + title)
+    plt.title(title)
     plt.xlabel('Iteration')
     plt.ylabel('Accuracy')
     plt.plot(overfitting_points.index.values, overfitting_points['eth_train_acc'], label='Eth train')
     plt.plot(overfitting_points.index.values, overfitting_points['eth_valid_acc'], label='Eth valid')
-    plt.legend()
-    plt.savefig(ETH_FIGURE_PATH)
-    plt.clf()
-    plt.title('Bitcoin - ' + title)
-    plt.xlabel('Iteration')
-    plt.ylabel('Accuracy')
     plt.plot(overfitting_points.index.values, overfitting_points['btc_train_acc'], label='Btc train')
     plt.plot(overfitting_points.index.values, overfitting_points['btc_valid_acc'], label='Btc valid')
     plt.legend()
-    plt.savefig(BTC_FIGURE_PATH)
+    plt.savefig(FIGURE_PATH)
+    plt.close()
 
 #########################################################
 # Helper Functions

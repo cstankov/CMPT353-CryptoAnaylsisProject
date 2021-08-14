@@ -59,7 +59,6 @@ def split_data(data):
 def split_data_for_linear(data):
     X = data.iloc[:, data.columns != 'Close']
     y = data['Close']
-    print(X)
     X_train, X_valid, y_train, y_valid = train_test_split(X, y)
     return [X_train, X_valid, y_train, y_valid]
 
