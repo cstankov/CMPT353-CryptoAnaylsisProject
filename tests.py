@@ -83,8 +83,10 @@ def get_contingency(data):
     new2 = new2.rename(columns={"Price_change": "value"})
     new2['type'] = 'Price_change'
     data = pd.concat([new1, new2]).reset_index(drop = True)
+    temp = pd.concat([new1, new2], axis=1).reset_index(drop = True)
+    print(temp)
     print("-------------------------------------------------")
-    print("Covariance for sentiment and price change: ", data.cov())
+    print("Covariance for sentiment and price change: ", temp.cov())
     print("-------------------------------------------------\n\n")
     return pd.crosstab(data['type'], data['value'])
 
