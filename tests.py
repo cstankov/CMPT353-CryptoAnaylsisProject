@@ -30,7 +30,6 @@ def get_contingency_table_for_mcnemar(eth_data, btc_data):
     btc_data['Symbol'] = 'BTC'
     btc_data = btc_data[['Price_change', 'Symbol']]
     data = pd.concat([eth_data, btc_data]).reset_index(drop = True)
-    # print("Covariance for price change for crypto: ", data.cov())
     return pd.crosstab(data['Symbol'], data['Price_change'])
 
 #########################################################
@@ -83,11 +82,6 @@ def get_contingency(data):
     new2 = new2.rename(columns={"Price_change": "value"})
     new2['type'] = 'Price_change'
     data = pd.concat([new1, new2]).reset_index(drop = True)
-    temp = pd.concat([new1, new2], axis=1).reset_index(drop = True)
-    print(temp)
-    print("-------------------------------------------------")
-    print("Covariance for sentiment and price change: ", temp.cov())
-    print("-------------------------------------------------\n\n")
     return pd.crosstab(data['type'], data['value'])
 
 #########################################################
