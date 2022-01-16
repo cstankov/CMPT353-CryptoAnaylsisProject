@@ -1,16 +1,20 @@
 # CMPT353-CryptoAnaylsisProject
 
+An exploratory data analysis on the effects that influential people on twitter such as Elon Musk have on the cryptocurrency market. With Sklearn neural network, random forest and naïve bayes classifiers we hope to see if we are able to predict the price change based on the sentiment analysis of the tweets.
+
+## Usage
+
 Command to run the project: python cryptoAnalysis.py (main program)
 Command to run the twitter scraper: python scrapetweets.py
 
 
 The follow are the libraries that we used: 
-vaderSentiment
-sklearn
-matplotlib
-pandas
-numpy
-twint (Do not need to run the main program above)
+vaderSentiment\
+sklearn\
+matplotlib\
+pandas\
+numpy\
+twint (Do not need to run the main program above)\
 
 
 Raw datasets are contained in the raw_data folder 
